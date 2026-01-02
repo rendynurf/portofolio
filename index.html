@@ -75,7 +75,7 @@
             --shadow-hover: 0 15px 50px 0 rgba(0, 0, 0, 0.5);
             
             /* UI Colors */
-            --nav-bg: rgba(0, 0, 0, 0.3); /* Lebih transparan */
+            --nav-bg: rgba(0, 0, 0, 0.3);
             --nav-border: rgba(255, 255, 255, 0.08);
             --nav-text: #F5F5F7;
             
@@ -173,46 +173,146 @@
         @keyframes pulse-core { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.7; } }
         @keyframes fade-text { 0% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* --- GLASS MORPHISM NAV --- */
-        nav { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 5%; width: 100%; position: sticky; top: 0; 
-            background: var(--nav-bg); 
-            backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); 
-            z-index: 1000; 
-            border-bottom: 1px solid var(--nav-border); 
-            transition: all 0.4s ease; 
-        }
-        .logo { font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        /* ========================================= */
+        /* --- 4. NAVIGATION (APPLE DOCK ONLY) --- */
+        /* ========================================= */
         
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-        
-        /* MENU NAVIGATION (Desktop Default) */
-        .nav-menu {
-            display: flex; gap: 20px; list-style: none; margin: 0 20px;
-            flex: 1; justify-content: center;
+        /* Container untuk Dock agar berada di layer atas */
+        .dock-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            pointer-events: auto; /* Memastikan bisa diklik */
         }
-        .nav-menu li a {
-            color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500;
-            transition: all 0.3s; opacity: 0.8; letter-spacing: 0.5px; white-space: nowrap;
-        }
-        .nav-menu li a:hover { color: var(--primary); opacity: 1; text-shadow: 0 0 10px rgba(var(--primary-rgb), 0.4); }
 
-        .header-datetime { 
-            font-size: 0.75rem; font-weight: 500; color: var(--text-muted); 
-            background: rgba(128,128,128,0.05); padding: 6px 14px; border-radius: 20px; 
-            border: 1px solid var(--nav-border); white-space: nowrap; 
-            display: flex; align-items: center; gap: 6px;
+        .nav-menu {
+            display: flex; 
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            margin: 0;
+            
+            /* Liquid Glass Effect */
+            background: rgba(22, 22, 24, 0.65);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-radius: 50px;
+            
+            list-style: none;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Hover pada Container Dock (Melebar sedikit) */
+        .nav-menu:hover {
+            background: rgba(22, 22, 24, 0.85);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            padding: 18px 30px; 
+            gap: 20px;
+            transform: scale(1.02);
+        }
+
+        .nav-menu li { display: flex; align-items: center; }
+
+        .nav-menu li a {
+            color: var(--text); text-decoration: none; 
+            font-size: 0.95rem; font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        /* --- ANIMASI ZOOM LIQUID GLASS --- */
+        .nav-menu li a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            /* Efek Zoom Fish-eye sederhana */
+            transform: translateY(-15px) scale(1.3); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        /* Efek Dot Indikator */
+        .nav-menu li a::after {
+            content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 4px; height: 4px; background: var(--primary); border-radius: 50%;
+            transition: 0.3s;
+        }
+        .nav-menu li a:hover::after { transform: translateX(-50%) scale(1); }
+
+        /* ========================================= */
+        /* --- RESPONSIVE / MEDIA QUERIES --- */
+        /* ========================================= */
+
+        /* 1. DESKTOP (> 1024px) */
+        @media(min-width: 1025px) {
+            .hero-content { flex-direction: row; text-align: left; }
+            .hero-text { padding-right: 50px; }
+            .hero-img-container { justify-content: flex-end; padding-right: 20px; }
+            .profile-wrapper { width: 340px; }
+            .close-modal { top: -50px; right: 0; width: 40px; height: 40px; font-size: 2rem; background: rgba(255,255,255,0.1); }
+            .modal-body { overflow: visible; }
+            .modal-text-container { max-height: 30vh; }
+        }
+
+        /* 2. TABLET & MOBILE UNIFIED (<= 1024px) */
+        @media(max-width: 1024px) {
+            .hero-content { flex-direction: column-reverse; text-align: center; }
+            .hero-text { padding: 0; }
+            .hero-name { font-size: 3rem; }
+            .hero-bio { margin-left: auto; margin-right: auto; }
+            .social-links { justify-content: center; }
+            .profile-wrapper { width: 280px; margin-bottom: 40px; }
+
+            /* Penyesuaian Dock Mobile */
+            .dock-container {
+                bottom: 20px;
+                width: 95%; /* Lebih lebar di mobile */
+                max-width: 450px;
+            }
+
+            .nav-menu {
+                padding: 12px 20px;
+                gap: 10px;
+                overflow-x: auto; /* Scrollable jika icon banyak */
+                justify-content: flex-start; /* Alignment kiri untuk scroll */
+                -ms-overflow-style: none; scrollbar-width: none;
+                border-radius: 30px;
+            }
+            .nav-menu::-webkit-scrollbar { display: none; }
+            
+            /* Disable zoom berlebihan di mobile agar tidak mengganggu touch */
+            .nav-menu:hover { padding: 12px 20px; gap: 10px; transform: scale(1); } 
+            
+            .nav-menu li a {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            .nav-menu li a:hover {
+                transform: translateY(-5px) scale(1.1); /* Zoom lebih kecil untuk mobile */
+            }
         }
         
-        .mascot-container { 
-            width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; 
-            border-radius: 50%; background: rgba(var(--primary-rgb), 0.1); 
-            color: var(--primary); font-size: 0.9rem;
+        /* 3. MOBILE SPECIFIC (< 768px) */
+        @media(max-width: 767px) {
+            .profile-wrapper { width: 180px; margin-bottom: 30px; }
+            section { padding: 60px 0; }
+            .hero-name { font-size: 2.2rem; }
+            .hero-roles { font-size: 1.2rem; }
+            .hero-bio { font-size: 0.95rem; }
+            .cv-card { padding: 24px; }
+            .gallery-card { width: 260px; }
+            .modal-body { border-radius: 20px 20px 0 0; max-height: 85vh; width: 100%; transform-origin: bottom; padding-bottom: 30px; }
+            .modal-content { max-height: 40vh; }
         }
 
         /* --- HERO SECTION --- */
-        #hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding-top: 80px; }
+        #hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding-top: 20px; }
         .hero-content { display: flex; width: 100%; align-items: center; gap: 50px; }
         
         .hero-text { flex: 1; z-index: 2; }
@@ -390,95 +490,6 @@
         footer p { font-size: 0.9rem; color: var(--footer-text); display: flex; align-items: center; justify-content: center; gap: 8px; }
         .footer-signal { width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; box-shadow: 0 0 10px #4CAF50; animation: blink 2s infinite; }
 
-        /* ========================================= */
-        /* --- RESPONSIVE / MEDIA QUERIES --- */
-        /* ========================================= */
-
-        /* 1. DESKTOP (> 1024px) */
-        @media(min-width: 1025px) {
-            .hero-content { flex-direction: row; text-align: left; }
-            .hero-text { padding-right: 50px; }
-            .hero-img-container { justify-content: flex-end; padding-right: 20px; }
-            .profile-wrapper { width: 340px; }
-            .close-modal { top: -50px; right: 0; width: 40px; height: 40px; font-size: 2rem; background: rgba(255,255,255,0.1); }
-            .modal-body { overflow: visible; }
-            .modal-text-container { max-height: 30vh; }
-        }
-
-        /* 2. TABLET & MOBILE UNIFIED DOCK (<= 1024px) */
-        @media(max-width: 1024px) {
-            .hero-content { flex-direction: column-reverse; text-align: center; }
-            .hero-text { padding: 0; }
-            .hero-name { font-size: 3rem; }
-            .hero-bio { margin-left: auto; margin-right: auto; }
-            .social-links { justify-content: center; }
-            .profile-wrapper { width: 280px; margin-bottom: 40px; }
-
-            /* Hide Desktop Elements from Top Bar */
-            .header-datetime { display: none; }
-            
-            /* --- APPLE LIQUID GLASS DOCK (BOTTOM NAV) --- */
-            .nav-menu {
-                display: flex; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-                width: auto; max-width: 95%; 
-                background: rgba(22, 22, 24, 0.75); /* Darker glass */
-                padding: 12px 20px; 
-                overflow-x: auto; justify-content: flex-start; 
-                backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
-                border: 1px solid rgba(255, 255, 255, 0.12);
-                border-radius: 50px; /* Capsule Shape */
-                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-                z-index: 9999; margin: 0; gap: 15px;
-            }
-            
-            /* Hide scrollbar on nav but keep functionality */
-            .nav-menu::-webkit-scrollbar { display: none; }
-            .nav-menu { -ms-overflow-style: none; scrollbar-width: none; }
-
-            .nav-menu li { flex-shrink: 0; display: flex; align-items: center; }
-            .nav-menu li a { 
-                font-size: 0.8rem; padding: 8px 16px; 
-                background: rgba(255,255,255,0.08); 
-                border-radius: 30px; 
-                color: #fff;
-                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            }
-            
-            /* Liquid Hover Effect */
-            .nav-menu li a:hover {
-                background: rgba(255,255,255,0.2);
-                transform: scale(1.1) translateY(-3px);
-                box-shadow: 0 5px 15px rgba(255,255,255,0.1);
-            }
-        }
-
-        /* 3. MOBILE SPECIFIC (< 768px) */
-        @media(max-width: 767px) {
-            /* --- PROFILE IMAGE FOR MOBILE --- */
-            .profile-wrapper { 
-                width: 180px; 
-                margin-bottom: 30px; 
-            }
-
-            section { padding: 60px 0; }
-            nav { padding: 15px 20px; justify-content: center; } /* Center logo on mobile */
-            .nav-left { justify-content: center; width: 100%; }
-            .nav-right { display: none; } /* Hide empty right div */
-
-            .hero-name { font-size: 2.2rem; }
-            .hero-roles { font-size: 1.2rem; letter-spacing: 0.5px; }
-            .hero-bio { font-size: 0.95rem; }
-            .cv-card { padding: 24px; }
-            .gallery-card { width: 260px; }
-            .modal { padding: 0; align-items: flex-end; } 
-            .modal-body { border-radius: 20px 20px 0 0; max-height: 85vh; width: 100%; transform-origin: bottom; padding-bottom: 30px; }
-            .modal-content { max-height: 40vh; }
-            .modal-text-container { overflow-y: auto; padding-bottom: 20px; }
-            
-            /* Adjust Dock position slightly for small screens */
-            .nav-menu { bottom: 15px; padding: 10px 15px; gap: 10px; }
-            .nav-menu li a { padding: 6px 12px; font-size: 0.75rem; }
-        }
     </style>
 </head>
 <body>
@@ -506,11 +517,7 @@
         </div>
     </div>
 
-    <nav>
-        <div class="nav-left" style="display:flex; align-items:center; gap:15px;">
-            <div class="logo">RNF. <div class="mascot-container"><i class="fas fa-satellite"></i></div></div>
-        </div>
-        
+    <nav class="dock-container">
         <ul class="nav-menu">
             <li><a href="#hero">Profile</a></li>
             <li><a href="#education">Pendidikan</a></li>
@@ -520,10 +527,6 @@
             <li><a href="#achievements">Prestasi</a></li>
             <li><a href="#certificates">Sertifikat</a></li>
         </ul>
-        
-        <div class="nav-right">
-            <div class="header-datetime" id="currentDateTime"><i class="far fa-clock"></i> <span>...</span></div>
-        </div>
     </nav>
 
     <section id="hero" class="container">
@@ -596,11 +599,12 @@
         const DEFAULT_LINKEDIN = "http://linkedin.com/in/rendynurf452";
 
         // ===============================================
-        // THREE.JS REALISTIC IMPLEMENTATION (DARK MODE OPTIMIZED)
+        // THREE.JS REALISTIC IMPLEMENTATION (ASIA & REALTIME)
         // ===============================================
         let scene, camera, renderer;
         let earthGroup, earthMesh, cloudsMesh, moonGroup, moonMesh;
         let starsMesh;
+        let sunLight, ambientLight; 
         
         function init3D() {
             const canvas = document.getElementById('universeCanvas');
@@ -608,9 +612,10 @@
             // Scene Setup
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 30; // Initial Position
+            camera.position.z = 30; // Posisi awal kamera
 
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            // Performance: Alpha & Antialias. 
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -620,19 +625,24 @@
             earthGroup = new THREE.Group();
             scene.add(earthGroup);
 
-            // 1. Earth Sphere (Day + Night Lights)
+            // Optimization: Reduced Segments
             const earthGeo = new THREE.SphereGeometry(8, 64, 64);
             const earthMat = new THREE.MeshPhongMaterial({
                 map: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
                 bumpMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
-                bumpScale: 0.1,
+                bumpScale: 0.15,
                 specularMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
                 emissiveMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-night.jpg'),
-                emissive: new THREE.Color(0xaaaaaa),
-                emissiveIntensity: 0.4, 
-                shininess: 10
+                emissive: new THREE.Color(0xffffff), // Warna putih agar tekstur emissiveMap terlihat
+                emissiveIntensity: 0.1, // Start dim (will be updated in animate)
+                shininess: 15
             });
             earthMesh = new THREE.Mesh(earthGeo, earthMat);
+            
+            // --- POSISI ASIA (INDONESIA) MENGHADAP KAMERA ---
+            // Putar fix sekitar 4.75 radian agar Indonesia menghadap sumbu Z+ (Kamera).
+            earthMesh.rotation.y = 4.75; 
+            
             earthGroup.add(earthMesh);
 
             // 2. Clouds
@@ -645,11 +655,13 @@
                 side: THREE.DoubleSide
             });
             cloudsMesh = new THREE.Mesh(cloudGeo, cloudMat);
+            // Samakan rotasi awal awan dengan bumi
+            cloudsMesh.rotation.y = 4.75; 
             earthGroup.add(cloudsMesh);
 
             // --- MOON ---
-            moonGroup = new THREE.Group(); // Pivot for orbit
-            earthGroup.add(moonGroup); 
+            moonGroup = new THREE.Group(); 
+            scene.add(moonGroup); // Moon orbit independent of Earth rotation group
 
             const moonGeo = new THREE.SphereGeometry(2, 32, 32);
             const moonMat = new THREE.MeshPhongMaterial({
@@ -657,23 +669,22 @@
                 shininess: 0
             });
             moonMesh = new THREE.Mesh(moonGeo, moonMat);
-            moonMesh.position.set(16, 0, 0); 
+            moonMesh.position.set(20, 0, 0); 
             moonGroup.add(moonMesh);
 
-            // --- LIGHTING ---
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.2); 
+            // --- LIGHTING (REALTIME SUN) ---
+            ambientLight = new THREE.AmbientLight(0x404040, 0.1); // Cahaya dasar (diupdate di animate)
             scene.add(ambientLight);
 
-            // Sun Light (Posisi Statis Matahari)
-            const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
-            sunLight.position.set(50, 20, 30);
+            // Matahari (Directional Light) - Posisi akan diupdate di animate()
+            sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
             scene.add(sunLight);
 
             // Stars Background
             const starGeo = new THREE.BufferGeometry();
-            const starCount = 1500;
+            const starCount = 2000;
             const starPos = new Float32Array(starCount * 3);
-            for(let i=0; i<starCount*3; i++) starPos[i] = (Math.random() - 0.5) * 600;
+            for(let i=0; i<starCount*3; i++) starPos[i] = (Math.random() - 0.5) * 800;
             starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
             const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.8 });
             starsMesh = new THREE.Points(starGeo, starMat);
@@ -692,8 +703,8 @@
 
             if (scrollY > threshold) {
                 // Zoom In & Move Down (Horizon View)
-                targetZ = 14; 
-                targetY = -8; 
+                targetZ = 16; 
+                targetY = -6; 
             } else {
                 // Reset to Full View
                 targetZ = 30; 
@@ -701,36 +712,73 @@
             }
         });
 
+        // Optimization: Pause animation when tab is not visible
         function animate() {
-            requestAnimationFrame(animate);
-            
-            // --- REALTIME EARTH ROTATION LOGIC ---
-            // Menghitung rotasi berdasarkan jam user saat ini
-            const now = new Date();
-            // Total menit dalam satu hari (0 - 1440)
-            const minutesToday = (now.getHours() * 60) + now.getMinutes();
-            // Persentase hari yang telah berlalu (0.0 - 1.0)
-            const dayRatio = minutesToday / 1440;
-            
-            // Rotasi Bumi Penuh adalah Math.PI * 2 (360 derajat)
-            // Offset -1.8 digunakan untuk kalibrasi agar tekstur Indonesia menghadap matahari (posisi Z/kamera) saat jam 12 siang.
-            // Anda dapat mengubah angka offset ini jika tekstur tidak pas di tengah.
-            const rotationOffset = -1.8; 
-            const realTimeRotation = (dayRatio * Math.PI * 2) + rotationOffset;
-
-            // Terapkan rotasi
-            if(earthMesh) earthMesh.rotation.y = realTimeRotation;
-            if(cloudsMesh) {
-                cloudsMesh.rotation.y = realTimeRotation + 0.05; // Sedikit offset untuk efek awan
-                cloudsMesh.rotation.x += 0.0001; // Efek angin vertikal kecil
+            if (document.hidden) {
+                setTimeout(() => requestAnimationFrame(animate), 500); 
+                return;
             }
 
-            // Bulan tetap berputar mengelilingi bumi
-            if(moonGroup) moonGroup.rotation.y += 0.002; 
-            if(moonMesh) moonMesh.rotation.y += 0.01; 
+            requestAnimationFrame(animate);
             
-            // Bintang berputar pelan
-            if(starsMesh) starsMesh.rotation.y -= 0.0002;
+            // --- REALTIME LIGHTING LOGIC (WIB UTC+7) ---
+            const now = new Date();
+            // Ambil jam dalam WIB (UTC+7)
+            const utcHours = now.getUTCHours();
+            const wibHours = (utcHours + 7) % 24; 
+            const minutes = now.getMinutes();
+            
+            // Konversi waktu total ke dalam sudut (0 - 2PI)
+            // Jam 12 Siang = Matahari di Depan Kamera (Z+) -> Sudut 0
+            // Jam 24 Malam = Matahari di Belakang Kamera (Z-) -> Sudut PI
+            const totalHours = wibHours + (minutes / 60);
+            
+            // Hitung sudut matahari. Offset jam 12 jadi 0 (tengah depan).
+            const sunDistance = 60;
+            const sunAngle = ((totalHours - 12) / 24) * Math.PI * 2; 
+            
+            if(sunLight) {
+                sunLight.position.x = Math.sin(sunAngle) * sunDistance; // Gerak Timur ke Barat
+                sunLight.position.z = Math.cos(sunAngle) * sunDistance; 
+                sunLight.position.y = Math.cos(sunAngle * 0.5) * 10; // Sedikit naik turun untuk variasi musim
+            }
+
+            // --- REALISTIC NIGHT LIGHTS LOGIC ---
+            // Hitung seberapa "malam" bagian depan bumi (Indonesia).
+            // Math.cos(sunAngle) = 1 saat siang (depan), -1 saat tengah malam (belakang).
+            // Normalisasi ke skala 0 (Siang Terang) hingga 1 (Malam Gelap).
+            const dayNightRatio = (Math.cos(sunAngle) + 1) / 2; // 0 s.d 1 (Malam ke Siang)
+            const nightIntensity = 1 - dayNightRatio; // 1 saat malam, 0 saat siang
+
+            if (earthMesh && earthMesh.material) {
+                // Tingkatkan intensitas lampu kota secara tajam saat malam.
+                // Menggunakan Math.pow agar lampu menyala lebih cepat saat senja.
+                const targetEmissive = 0.05 + (Math.pow(nightIntensity, 4) * 2.5);
+                // Transisi halus
+                earthMesh.material.emissiveIntensity += (targetEmissive - earthMesh.material.emissiveIntensity) * 0.1;
+            }
+
+            if(ambientLight) {
+                // Redupkan cahaya sekitar saat malam agar kontras lampu kota lebih terlihat
+                const targetAmbient = 0.05 + (dayNightRatio * 0.15);
+                 ambientLight.intensity += (targetAmbient - ambientLight.intensity) * 0.1;
+            }
+
+            // Awan tetap berputar pelan agar dinamis
+            if(cloudsMesh) {
+                cloudsMesh.rotation.y += 0.0003; // Drift pelan
+            }
+
+            // Bulan Orbit Realtime (Sangat lambat, tapi kita percepat untuk visual)
+            if(moonGroup) {
+                moonGroup.rotation.y += 0.001; 
+            }
+            if(moonMesh) {
+                 moonMesh.rotation.y += 0.002; 
+            }
+            
+            // Stars background slow rotation
+            if(starsMesh) starsMesh.rotation.y -= 0.0001;
 
             // Scroll Zoom Interpolation
             if(camera && earthGroup) {
@@ -747,7 +795,7 @@
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 // Adjust base zoom for mobile
-                targetZ = (window.innerWidth < 768) ? 40 : 30; 
+                targetZ = (window.innerWidth < 768) ? 45 : 30; 
             }
         });
 
@@ -757,16 +805,6 @@
         // ===============================================
         // LOGIC & DATA
         // ===============================================
-
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
-            const dateStr = now.toLocaleDateString('id-ID', options).replace('.', ':');
-            const el = document.querySelector('#currentDateTime span');
-            if(el) el.textContent = dateStr;
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
 
         const MOCK_DATA = {
             Profile: [{
