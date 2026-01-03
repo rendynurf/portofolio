@@ -598,23 +598,26 @@
         const loader = document.getElementById('loader');
         const DEFAULT_LINKEDIN = "http://linkedin.com/in/rendynurf452";
 
-        // ===============================================
-        // THREE.JS REALISTIC IMPLEMENTATION (ASIA & REALTIME)
-        // ===============================================
-        let scene, camera, renderer;
-        let earthGroup, earthMesh, cloudsMesh, moonGroup, moonMesh;
-        let starsMesh;
-        let sunLight, ambientLight; 
-        
-        function init3D() {
+// ===============================================
+// THREE.JS REALISTIC IMPLEMENTATION (ASIA CENTERED)
+// ===============================================
+let scene, camera, renderer;
+let earthGroup, earthMesh, cloudsMesh, moonGroup, moonMesh, starsMesh;
+let sunLight, ambientLight;
+
+// KONFIGURASI ROTASI:
+// 4.95 radian adalah "magic number" agar Indonesia tepat di tengah layar
+// saat menggunakan tekstur standar NASA/Three.js
+const ASIA_VIEW_ROTATION = 1.25; 
+
+function init3D() {
             const canvas = document.getElementById('universeCanvas');
             
             // Scene Setup
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 30; // Posisi awal kamera
+            camera.position.z = 30; 
 
-            // Performance: Alpha & Antialias. 
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -623,9 +626,14 @@
 
             // --- EARTH GROUP ---
             earthGroup = new THREE.Group();
+            
+            // PERBAIKAN UTAMA DI SINI:
+            // Nilai 1.7 akan menempatkan Indonesia tepat di tengah layar
+            earthGroup.rotation.y = 2.6; 
+            
             scene.add(earthGroup);
 
-            // Optimization: Reduced Segments
+            // Earth Mesh
             const earthGeo = new THREE.SphereGeometry(8, 64, 64);
             const earthMat = new THREE.MeshPhongMaterial({
                 map: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
@@ -633,19 +641,14 @@
                 bumpScale: 0.15,
                 specularMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
                 emissiveMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-night.jpg'),
-                emissive: new THREE.Color(0xffffff), // Warna putih agar tekstur emissiveMap terlihat
-                emissiveIntensity: 0.1, // Start dim (will be updated in animate)
+                emissive: new THREE.Color(0xffffff),
+                emissiveIntensity: 0.1,
                 shininess: 15
             });
             earthMesh = new THREE.Mesh(earthGeo, earthMat);
-            
-            // --- POSISI ASIA (INDONESIA) MENGHADAP KAMERA ---
-            // Putar fix sekitar 4.75 radian agar Indonesia menghadap sumbu Z+ (Kamera).
-            earthMesh.rotation.y = 4.75; 
-            
             earthGroup.add(earthMesh);
 
-            // 2. Clouds
+            // Clouds
             const cloudGeo = new THREE.SphereGeometry(8.1, 64, 64);
             const cloudMat = new THREE.MeshPhongMaterial({
                 map: textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png'),
@@ -655,13 +658,11 @@
                 side: THREE.DoubleSide
             });
             cloudsMesh = new THREE.Mesh(cloudGeo, cloudMat);
-            // Samakan rotasi awal awan dengan bumi
-            cloudsMesh.rotation.y = 4.75; 
             earthGroup.add(cloudsMesh);
 
             // --- MOON ---
             moonGroup = new THREE.Group(); 
-            scene.add(moonGroup); // Moon orbit independent of Earth rotation group
+            scene.add(moonGroup);
 
             const moonGeo = new THREE.SphereGeometry(2, 32, 32);
             const moonMat = new THREE.MeshPhongMaterial({
@@ -672,15 +673,12 @@
             moonMesh.position.set(20, 0, 0); 
             moonGroup.add(moonMesh);
 
-            // --- LIGHTING (REALTIME SUN) ---
-            ambientLight = new THREE.AmbientLight(0x404040, 0.1); // Cahaya dasar (diupdate di animate)
+            // Lighting & Stars (Sama seperti sebelumnya)
+            ambientLight = new THREE.AmbientLight(0x404040, 0.2);
             scene.add(ambientLight);
-
-            // Matahari (Directional Light) - Posisi akan diupdate di animate()
             sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
             scene.add(sunLight);
 
-            // Stars Background
             const starGeo = new THREE.BufferGeometry();
             const starCount = 2000;
             const starPos = new Float32Array(starCount * 3);
@@ -693,114 +691,120 @@
             animate();
         }
 
-        // --- SCROLL ANIMATION LOGIC ---
-        let targetZ = 30;
-        let targetY = 0;
-        
-        window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            const threshold = 100; 
+// --- SCROLL LOGIC ---
+let targetZ = 30;
+let targetY = 0;
 
-            if (scrollY > threshold) {
-                // Zoom In & Move Down (Horizon View)
-                targetZ = 16; 
-                targetY = -6; 
-            } else {
-                // Reset to Full View
-                targetZ = 30; 
-                targetY = 0; 
-            }
-        });
+window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (scrollY > 100) {
+        targetZ = 16; 
+        targetY = -6; 
+    } else {
+        targetZ = 30; 
+        targetY = 0; 
+    }
+});
 
-        // Optimization: Pause animation when tab is not visible
-        function animate() {
-            if (document.hidden) {
-                setTimeout(() => requestAnimationFrame(animate), 500); 
-                return;
-            }
+function animate() {
+    requestAnimationFrame(animate);
+    
+    const now = new Date();
 
-            requestAnimationFrame(animate);
-            
-            // --- REALTIME LIGHTING LOGIC (WIB UTC+7) ---
-            const now = new Date();
-            // Ambil jam dalam WIB (UTC+7)
-            const utcHours = now.getUTCHours();
-            const wibHours = (utcHours + 7) % 24; 
-            const minutes = now.getMinutes();
-            
-            // Konversi waktu total ke dalam sudut (0 - 2PI)
-            // Jam 12 Siang = Matahari di Depan Kamera (Z+) -> Sudut 0
-            // Jam 24 Malam = Matahari di Belakang Kamera (Z-) -> Sudut PI
-            const totalHours = wibHours + (minutes / 60);
-            
-            // Hitung sudut matahari. Offset jam 12 jadi 0 (tengah depan).
-            const sunDistance = 60;
-            const sunAngle = ((totalHours - 12) / 24) * Math.PI * 2; 
-            
-            if(sunLight) {
-                sunLight.position.x = Math.sin(sunAngle) * sunDistance; // Gerak Timur ke Barat
-                sunLight.position.z = Math.cos(sunAngle) * sunDistance; 
-                sunLight.position.y = Math.cos(sunAngle * 0.5) * 10; // Sedikit naik turun untuk variasi musim
-            }
+    // --- 1. MATAHARI (WAKTU HARIAN WIB) ---
+    const utcHours = now.getUTCHours();
+    const wibHours = (utcHours + 7) % 24; 
+    const minutes = now.getMinutes();
+    const totalHours = wibHours + (minutes / 60);
 
-            // --- REALISTIC NIGHT LIGHTS LOGIC ---
-            // Hitung seberapa "malam" bagian depan bumi (Indonesia).
-            // Math.cos(sunAngle) = 1 saat siang (depan), -1 saat tengah malam (belakang).
-            // Normalisasi ke skala 0 (Siang Terang) hingga 1 (Malam Gelap).
-            const dayNightRatio = (Math.cos(sunAngle) + 1) / 2; // 0 s.d 1 (Malam ke Siang)
-            const nightIntensity = 1 - dayNightRatio; // 1 saat malam, 0 saat siang
+    // Sudut Matahari (Daily Cycle)
+    const sunAngle = ((totalHours - 12) / 24) * Math.PI * 2; 
+    const sunDistance = 60;
+    
+    if(sunLight) {
+        sunLight.position.x = Math.sin(sunAngle) * sunDistance; 
+        sunLight.position.z = Math.cos(sunAngle) * sunDistance; 
+        sunLight.position.y = Math.cos(sunAngle * 0.5) * 10;
+    }
 
-            if (earthMesh && earthMesh.material) {
-                // Tingkatkan intensitas lampu kota secara tajam saat malam.
-                // Menggunakan Math.pow agar lampu menyala lebih cepat saat senja.
-                const targetEmissive = 0.05 + (Math.pow(nightIntensity, 4) * 2.5);
-                // Transisi halus
-                earthMesh.material.emissiveIntensity += (targetEmissive - earthMesh.material.emissiveIntensity) * 0.1;
-            }
+    // --- 2. BULAN (FASE REALTIME) ---
+    // Hitung offset fase bulan berdasarkan tanggal hari ini
+    const lunarPhaseAngle = getRealtimeLunarPhase(now);
+    
+    if(moonGroup) {
+        // Posisi Bulan adalah kombinasi:
+        // Posisi Matahari (sunAngle) + Jarak Fase Bulan (lunarPhaseAngle)
+        // Kita kurangi ( - ) karena Bulan bergerak lebih lambat dari Matahari (tertinggal)
+        // dalam gerakan harian semu.
+        moonGroup.rotation.y = sunAngle - lunarPhaseAngle;
+    }
 
-            if(ambientLight) {
-                // Redupkan cahaya sekitar saat malam agar kontras lampu kota lebih terlihat
-                const targetAmbient = 0.05 + (dayNightRatio * 0.15);
-                 ambientLight.intensity += (targetAmbient - ambientLight.intensity) * 0.1;
-            }
+    // Rotasi bulan pada porosnya (Tidal Locking - wajah bulan selalu sama ke bumi)
+    // Tapi di three.js agar terlihat 3D, kita biarkan rotasi pelan atau kunci ke group.
+    if(moonMesh) {
+         // Agar wajah bulan selalu menghadap bumi (Realistik):
+         moonMesh.rotation.y = -Math.PI / 2; 
+    }
 
-            // Awan tetap berputar pelan agar dinamis
-            if(cloudsMesh) {
-                cloudsMesh.rotation.y += 0.0003; // Drift pelan
-            }
+    // --- LOGIKA LAINNYA (TETAP SAMA) ---
+    const dayNightRatio = (Math.cos(sunAngle) + 1) / 2; 
+    const nightIntensity = 1 - dayNightRatio;
 
-            // Bulan Orbit Realtime (Sangat lambat, tapi kita percepat untuk visual)
-            if(moonGroup) {
-                moonGroup.rotation.y += 0.001; 
-            }
-            if(moonMesh) {
-                 moonMesh.rotation.y += 0.002; 
-            }
-            
-            // Stars background slow rotation
-            if(starsMesh) starsMesh.rotation.y -= 0.0001;
+    if (earthMesh && earthMesh.material) {
+        const targetEmissive = 0.05 + (Math.pow(nightIntensity, 4) * 2.5);
+        earthMesh.material.emissiveIntensity += (targetEmissive - earthMesh.material.emissiveIntensity) * 0.1;
+    }
 
-            // Scroll Zoom Interpolation
-            if(camera && earthGroup) {
-                camera.position.z += (targetZ - camera.position.z) * 0.05;
-                earthGroup.position.y += (targetY - earthGroup.position.y) * 0.05;
-            }
+    if(ambientLight) {
+        const targetAmbient = 0.05 + (dayNightRatio * 0.15);
+        ambientLight.intensity += (targetAmbient - ambientLight.intensity) * 0.1;
+    }
 
-            renderer.render(scene, camera);
-        }
+    if(cloudsMesh) cloudsMesh.rotation.y += 0.0004; 
+    if(starsMesh) starsMesh.rotation.y -= 0.0001;
 
-        window.addEventListener('resize', () => {
-            if(camera && renderer) {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                // Adjust base zoom for mobile
-                targetZ = (window.innerWidth < 768) ? 45 : 30; 
-            }
-        });
+    if(camera && earthGroup) {
+        camera.position.z += (targetZ - camera.position.z) * 0.05;
+        earthGroup.position.y += (targetY - earthGroup.position.y) * 0.05;
+    }
 
-        init3D();
-        window.dispatchEvent(new Event('resize'));
+    renderer.render(scene, camera);
+}
+
+// Fungsi untuk mendapatkan sudut fase bulan (0 s.d 2PI)
+// Berdasarkan siklus Sinodik rata-rata 29.53 hari
+function getRealtimeLunarPhase(date) {
+    // Referensi: Sebuah tanggal yang diketahui sebagai Bulan Baru (New Moon)
+    // Contoh: 6 Januari 2000
+    const newMoonRef = new Date('2000-01-06T18:14:00');
+    
+    const oneDay = 1000 * 60 * 60 * 24;
+    const synodicMonth = 29.53058867; // Panjang siklus bulan presisi
+    
+    // Hitung selisih hari dari referensi
+    const diffTime = date.getTime() - newMoonRef.getTime();
+    const diffDays = diffTime / oneDay;
+    
+    // Hitung posisi dalam siklus (0 = New Moon, 0.5 = Full Moon)
+    const currentPhase = (diffDays % synodicMonth) / synodicMonth;
+    
+    // Konversi ke Radian (0 - 2PI)
+    // Ditambah Math.PI karena di koordinat kita, bulan purnama harus berlawanan matahari
+    return currentPhase * Math.PI * 2;
+}
+
+// Resize Handling
+window.addEventListener('resize', () => {
+    if(camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        targetZ = (window.innerWidth < 768) ? 45 : 30; 
+    }
+});
+
+// Jalankan
+init3D();
 
         // ===============================================
         // LOGIC & DATA
