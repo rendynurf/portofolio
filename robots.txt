@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rendynur.netlify.app/sitemap.xml
+Sitemap: https://rendynurf.github.io/portofolio/sitemap.xml
