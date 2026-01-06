@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rendynur.netlify.app/sitemap.xml
