@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+    <title>Rendy Nur Firmansyah | Web Developer & Data Analyst Indonesia</title>
+    
+    <meta name="description" content="Portfolio Rendy Nur Firmansyah. Jasa Web Developer & Data Analyst Profesional di Purworejo, Jawa Tengah. Spesialis React, Three.js, dan Analisis Data.">
+    <meta name="keywords" content="Rendy Nur Firmansyah, Jasa Web Developer Purworejo, Data Analyst Indonesia, Frontend Developer, Portfolio Programmer, Rendynur, Three.js Developer, Pembuatan Website Murah">
+    <meta name="author" content="Rendy Nur Firmansyah">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Indonesian">
+    <meta name="geo.placename" content="Purworejo, Jawa Tengah, Indonesia">
+    <meta name="geo.region" content="ID-JT">
+    
+    <link rel="canonical" href="https://portofolio.rendynurf.my.id/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portofolio.rendynurf.my.id/"> 
+    <meta property="og:title" content="Rendy Nur Firmansyah | Professional Portfolio">
+    <meta property="og:description" content="Lihat karya Web Development & Data Analysis terbaik dari Rendy Nur Firmansyah.">
+    <meta property="og:image" content="image/rnf.png"> 
+    <meta property="og:site_name" content="Rendy Nur Firmansyah Portfolio">
+    <meta property="og:locale" content="id_ID">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://portofolio.rendynurf.my.id/">
+    <meta name="twitter:title" content="Rendy Nur Firmansyah | Web Developer & Data Analyst">
+    <meta name="twitter:description" content="Portfolio Profesional Rendy Nur Firmansyah. Web, Data Analis, Teacher, & IT Support.">
+    <meta name="twitter:image" content="image/rnf.png">
+
+    <link rel="icon" type="image/png" href="image/rnf.png">
+    <link rel="apple-touch-icon" href="image/rnf.png">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "ProfilePage",
+      "mainEntity": {
+        "@type": "Person",
+        "name": "Rendy Nur Firmansyah",
+        "jobTitle": "Web Developer & Data Analyst",
+        "url": "https://portofolio.rendynurf.my.id/",
+        "image": "https://portofolio.rendynurf.my.id/image/rnf.png",
+        "sameAs": [
+          "http://linkedin.com/in/rendynurf452",
+          "http://instagram.com/rendynur",
+          "http://facebook.com/rendynur"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Purworejo",
+          "addressRegion": "Jawa Tengah",
+          "addressCountry": "Indonesia"
+        },
+        "description": "Profesional Web Developer dan Data Analyst yang berbasis di Indonesia."
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <canvas id="universeCanvas"></canvas>
+
+    <div id="loader">
+        <div class="loader-system">
+            <div class="loader-core"></div>
+            <div class="loader-orbit"></div>
+        </div>
+        <div class="loader-text">TUNGGU SEBENTAR...</div>
+    </div>
+
+    <div id="imgModal" class="modal" aria-hidden="true">
+        <div class="modal-body">
+            <span class="close-modal" onclick="closeModal()" role="button" aria-label="Close">×</span>
+            <img class="modal-content" id="modalImage" alt="Project Preview">
+            <div class="modal-text-container">
+                <div id="modalCaption"></div>
+                <a id="modalLinkBtn" href="#" target="_blank" style="display: none;">
+                    Visit Project <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <nav class="dock-container">
+        <ul class="nav-menu">
+            <li><a href="#hero">Profile</a></li>
+            <li><a href="#education">Pendidikan</a></li>
+            <li><a href="#experience">Pengalaman</a></li>
+            <li><a href="#organization">Organisasi</a></li>
+            <li><a href="#projects">Project</a></li>
+            <li><a href="#achievements">Prestasi</a></li>
+            <li><a href="#certificates">Sertifikat</a></li>
+        </ul>
+    </nav>
+
+    <section id="hero" class="container">
+        <div class="hero-content">
+            <div class="hero-text reveal">
+                <div class="hero-greeting">Halo, Saya</div>
+                <h1 class="hero-name" id="profileName">Rendy Nur Firmansyah</h1>
+                <div class="hero-roles" id="staticRole">Web Developer | Data Analyst</div>
+                <p class="hero-bio" id="profileBio">Membangun solusi digital yang estetis dan berbasis data. Berbasis di Purworejo, Indonesia.</p>
+                <div class="social-links" id="socialLinks">
+                    </div>
+            </div>
+            
+            <div class="hero-img-container reveal">
+                <div class="profile-wrapper">
+                    <div class="profile-glass-bg"></div>
+                    <img src="image/rnf.png" id="profileImg" class="profile-img-real" alt="Rendy Nur Firmansyah" onerror="this.onerror=null; this.src='';">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="education" class="container reveal">
+        <h2>Pendidikan</h2>
+        <div id="educationList"></div>
+    </section>
+
+    <section id="experience" class="container reveal">
+        <h2>Pengalaman Kerja</h2>
+        <div id="experienceList"></div>
+    </section>
+
+    <section id="organization" class="container reveal">
+        <h2>Pengalaman Organisasi</h2>
+        <div id="organizationList"></div>
+    </section>
+
+    <section id="projects" style="background: rgba(255,255,255,0.02); backdrop-filter: blur(5px);">
+        <div class="container">
+            <h2>Project & Portofolio</h2>
+            <p style="text-align: center; margin-bottom: 20px; opacity: 0.6; font-size: 0.9rem;">(Klik untuk detail proyek)</p>
+        </div>
+        <div class="marquee-section-container">
+            <div class="marquee-track" id="projectList"></div>
+        </div>
+    </section>
+
+    <section id="achievements" class="container reveal">
+        <h2>Prestasi</h2>
+        <div class="marquee-section-container" style="padding: 0;">
+            <div class="marquee-track" id="achievementList"></div>
+        </div>
+    </section>
+
+    <section id="certificates" class="container reveal">
+        <h2>Sertifikat Lainnya</h2>
+        <div class="marquee-section-container" style="padding: 0;">
+            <div class="marquee-track" id="certificateList"></div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Rendy Nur Firmansyah | Purworejo, Jawa Tengah <span class="footer-signal"></span></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

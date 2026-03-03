@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://portofolio.rendynurf.my.id/sitemap.xml
